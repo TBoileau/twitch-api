@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__.'/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\HttpClient\HttpClient;
+use TBoileau\TwitchApi\Command\GetTwitchCliCommand;
+
+$application = new Application();
+
+$application->add(new GetTwitchCliCommand(HttpClient::create(), __DIR__.'/../var'));
+
+$application->run();
