@@ -1,0 +1,29 @@
+{
+    "name": "tboileau/twitch-api",
+    "description": "Twitch API for PHP",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "TBoileau\\TwitchApi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TBoileau\\TwitchApi\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "TBoileau",
+            "email": "t-boileau@email.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.4"
+    }
+}
