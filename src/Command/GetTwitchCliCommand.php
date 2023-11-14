@@ -16,15 +16,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class GetTwitchCliCommand extends Command
 {
-    private const TWITCH_CLI_VERSION = '1.1.21';
-    private const TWITCH_CLI_DEFAULT_DISTRIBUTION = 'Linux_x86_64';
-    private const TWITCH_CLI_DISTRIBUTIONS = [
-        'Linux_arm64' => '.tar.gz',
-        'Linux_x86_64' => '.tar.gz',
-        'Darwin_arm64' => '.tar.gz',
-        'Darwin_x86_64' => '.tar.gz',
-        'Windows_i686' => '.zip',
-        'Windows_x86_64' => '.zip'
+    public const TWITCH_CLI_VERSION = '1.1.21';
+    public const TWITCH_CLI_DEFAULT_DISTRIBUTION = 'Linux_x86_64';
+    public const TWITCH_CLI_DISTRIBUTIONS = [
+        'Linux_arm64' => ['ext' => '.tar.gz', 'filename' => 'twitch'],
+        'Linux_x86_64' => ['ext' => '.tar.gz', 'filename' => 'twitch'],
+        'Darwin_arm64' => ['ext' => '.tar.gz', 'filename' => 'twitch'],
+        'Darwin_x86_64' => ['ext' => '.tar.gz', 'filename' => 'twitch'],
+        'Windows_i686' => ['ext' => '.zip', 'filename' => 'twitch.exe'],
+        'Windows_x86_64' => ['ext' => '.zip', 'filename' => 'twitch.exe'],
     ];
 
     protected static $defaultName = 'twitch:cli';
@@ -75,7 +75,9 @@ final class GetTwitchCliCommand extends Command
 
         $baseName = sprintf('twitch-cli_%s_%s', $release, $distribution);
 
-        $filename = sprintf('%s%s', $baseName, self::TWITCH_CLI_DISTRIBUTIONS[$distribution]);
+        $filename = sprintf('%s%s', $baseName, self::TWITCH_CLI_DISTRIBUTIONS[$distribution]['ext']);
+
+        $executable = self::TWITCH_CLI_DISTRIBUTIONS[$distribution]['filename'];
 
         $url = sprintf(
             'https://github.com/twitchdev/twitch-cli/releases/download/v%s/%s',
@@ -107,19 +109,31 @@ final class GetTwitchCliCommand extends Command
 
         $progressBar->finish();
 
-        $phar = new PharData(sprintf('%s/%s', $this->twitchCliDir, $filename));
-
-        $phar->extractTo($this->twitchCliDir, null, true);
-
         $filesystem = new Filesystem();
 
-        $filesystem->remove(sprintf('%s/twitch', $this->twitchCliDir));
+        try {
+            $phar = new PharData(sprintf('%s/%s', $this->twitchCliDir, $filename));
+
+            if (
+                !$phar->extractTo($this->twitchCliDir, null, true)
+                || !$filesystem->exists(sprintf('%s/%s', $this->twitchCliDir, $baseName))
+            ) {
+                throw new \Exception();
+            }
+        } catch (\Exception $e) {
+            $output->writeln('<error>Extract failed !</error>');
+            return Command::FAILURE;
+        }
+
+
+
+        $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $executable));
 
         $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $filename));
 
         $filesystem->rename(
-            sprintf('%s/%s/twitch', $this->twitchCliDir, $baseName),
-            sprintf('%s/twitch', $this->twitchCliDir)
+            sprintf('%s/%s/%s', $this->twitchCliDir, $baseName, $executable),
+            sprintf('%s/%s', $this->twitchCliDir, $executable)
         );
 
         $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $baseName));
@@ -128,11 +142,11 @@ final class GetTwitchCliCommand extends Command
 
         $output->writeln('<comment>Twitch Cli downloaded !</comment>');
 
-        $process = new Process([sprintf('%s/twitch', $this->twitchCliDir)]);
+        $process = new Process([sprintf('%s/%s', $this->twitchCliDir, $executable)]);
         $process->run();
 
         if (!$process->isSuccessful()) {
-            $filesystem->remove(sprintf('%s/twitch', $this->twitchCliDir));
+            $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $executable));
             $output->writeln('<error>Twitch Cli is not working !</error>');
             return Command::FAILURE;
         }
