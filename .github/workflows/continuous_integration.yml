@@ -31,3 +31,6 @@ jobs:
       - name: Quality
         run: |
           composer valid
+      - name: Tests
+        run: |
+          vendor/bin/phpunit
