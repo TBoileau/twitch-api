@@ -23,7 +23,8 @@
     "require": {
         "php": "^8.2",
         "ext-ctype": "*",
-        "ext-iconv": "*"
+        "ext-iconv": "*",
+        "symfony/http-client": "^6.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.4",
