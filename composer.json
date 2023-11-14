@@ -8,6 +8,11 @@
             "TBoileau\\TwitchApi\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "TBoileau\\TwitchApi\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "TBoileau",
