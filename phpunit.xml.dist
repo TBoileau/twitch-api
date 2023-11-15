@@ -6,8 +6,11 @@
     <server name="SHELL_VERBOSITY" value="-1"/>
   </php>
   <testsuites>
-    <testsuite name="Commands Test Suite">
+    <testsuite name="Commands">
       <directory>tests/Command</directory>
+    </testsuite>
+    <testsuite name="Api">
+      <directory>tests/Api</directory>
     </testsuite>
   </testsuites>
   <coverage/>
@@ -15,5 +18,11 @@
     <include>
       <directory suffix=".php">src</directory>
     </include>
+    <exclude>
+      <directory suffix=".php">src/PHPUnit</directory>
+    </exclude>
   </source>
+  <extensions>
+    <bootstrap class="TBoileau\TwitchApi\PHPUnit\PHPUnitExtension" />
+  </extensions>
 </phpunit>
