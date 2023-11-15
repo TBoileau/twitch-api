@@ -10,9 +10,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use TBoileau\TwitchApi\Command\GetTwitchCliCommand;
+use TBoileau\TwitchApi\Command\InstallTwitchCliCommand;
 
-final class GetTwitchCliCommandTest extends TestCase
+final class InstallTwitchCliCommandTest extends TestCase
 {
     private Application $application;
 
@@ -22,7 +22,7 @@ final class GetTwitchCliCommandTest extends TestCase
 
         $expectedRequests = [
             function ($method, $url): MockResponse {
-                $pattern = '/^https:\/\/github\.com\/twitchdev\/twitch-cli\/releases\/download\/v(?<release>\d+\.\d+\.\d+)\/twitch-cli_\d+\.\d+\.\d+_(?<distribution>[a-zA-Z0-9_]+)\.(tar.gz|exe)$/';
+                $pattern = '/^https:\/\/github\.com\/twitchdev\/twitch-cli\/releases\/download\/v(?<release>\d+\.\d+\.\d+)\/twitch-cli_\d+\.\d+\.\d+_(?<distribution>[a-zA-Z0-9_]+)\.(tar.gz|zip)$/';
 
                 self::assertMatchesRegularExpression($pattern, $url);
 
@@ -34,7 +34,7 @@ final class GetTwitchCliCommandTest extends TestCase
                 $filename = sprintf(
                     '%s%s',
                     $baseName,
-                    GetTwitchCliCommand::TWITCH_CLI_DISTRIBUTIONS[$distribution]['ext']
+                    InstallTwitchCliCommand::TWITCH_CLI_DISTRIBUTIONS[$distribution]['ext']
                 );
 
                 $localFilename = sprintf('%s/fixtures/%s', __DIR__, $filename);
@@ -54,9 +54,9 @@ final class GetTwitchCliCommandTest extends TestCase
         ];
 
         $this->application->add(
-            new GetTwitchCliCommand(
+            new InstallTwitchCliCommand(
                 new MockHttpClient($expectedRequests),
-                sys_get_temp_dir()
+                sprintf('%s/twitch', sys_get_temp_dir())
             )
         );
     }
@@ -64,9 +64,9 @@ final class GetTwitchCliCommandTest extends TestCase
     /**
      * @test
      */
-    public function shouldSuccessfullyGetTwitchCli(): void
+    public function shouldSuccessfullyInstallTwitchCli(): void
     {
-        $command = $this->application->find('twitch:cli');
+        $command = $this->application->find('twitch:install');
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
         $commandTester->assertCommandIsSuccessful();
@@ -79,7 +79,7 @@ final class GetTwitchCliCommandTest extends TestCase
      */
     public function shouldFailed(string $release, string $distribution): void
     {
-        $command = $this->application->find('twitch:cli');
+        $command = $this->application->find('twitch:install');
         $commandTester = new CommandTester($command);
         $commandTester->execute(['-r' => $release, '-d' => $distribution]);
         self::assertSame(Command::FAILURE, $commandTester->getStatusCode());
@@ -91,6 +91,6 @@ final class GetTwitchCliCommandTest extends TestCase
         yield 'invalid distribution' => ['1.1.21', 'fail'];
         yield 'download failed' => ['1.0.0', 'Linux_x86_64'];
         yield 'extraction error' => ['0.0.0', 'Linux_x86_64'];
-        yield 'executable not working' => ['1.1.21', 'Darwin_x86_64'];
+        yield 'executable not working' => ['1.1.21', 'Windows_i386'];
     }
 }

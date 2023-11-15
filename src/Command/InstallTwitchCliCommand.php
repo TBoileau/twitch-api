@@ -14,7 +14,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class GetTwitchCliCommand extends Command
+final class InstallTwitchCliCommand extends Command
 {
     public const TWITCH_CLI_VERSION = '1.1.21';
     public const TWITCH_CLI_DEFAULT_DISTRIBUTION = 'Linux_x86_64';
@@ -23,13 +23,13 @@ final class GetTwitchCliCommand extends Command
         'Linux_x86_64' => ['ext' => '.tar.gz', 'filename' => 'twitch'],
         'Darwin_arm64' => ['ext' => '.tar.gz', 'filename' => 'twitch'],
         'Darwin_x86_64' => ['ext' => '.tar.gz', 'filename' => 'twitch'],
-        'Windows_i686' => ['ext' => '.zip', 'filename' => 'twitch.exe'],
+        'Windows_i386' => ['ext' => '.zip', 'filename' => 'twitch.exe'],
         'Windows_x86_64' => ['ext' => '.zip', 'filename' => 'twitch.exe'],
     ];
 
-    protected static $defaultName = 'twitch:cli';
+    protected static $defaultName = 'twitch:install';
 
-    public function __construct(private readonly HttpClientInterface $httpClient, private readonly string $twitchCliDir)
+    public function __construct(private readonly HttpClientInterface $httpClient, private readonly string $twitchCliPath)
     {
         parent::__construct();
     }
@@ -101,7 +101,9 @@ final class GetTwitchCliCommand extends Command
             return Command::FAILURE;
         }
 
-        $fileHandler = fopen(sprintf('%s/%s', $this->twitchCliDir, $filename), 'w');
+        $tempFilename = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+
+        $fileHandler = fopen($tempFilename, 'w');
 
         foreach ($this->httpClient->stream($response) as $chunk) {
             fwrite($fileHandler, $chunk->getContent());
@@ -112,46 +114,59 @@ final class GetTwitchCliCommand extends Command
         $filesystem = new Filesystem();
 
         try {
-            $phar = new PharData(sprintf('%s/%s', $this->twitchCliDir, $filename));
-
-            if (
-                !$phar->extractTo($this->twitchCliDir, null, true)
-                || !$filesystem->exists(sprintf('%s/%s', $this->twitchCliDir, $baseName))
-            ) {
-                throw new \Exception();
+            if ($filesystem->exists($this->twitchCliPath)) {
+                $filesystem->remove($this->twitchCliPath);
             }
+
+            $phar = new PharData($tempFilename);
+
+            $phar->extractTo(dirname($this->twitchCliPath), sprintf('%s/%s', $baseName, $executable), true);
+
+            $filesystem->rename(
+                sprintf('%s/%s/%s', dirname($this->twitchCliPath), $baseName, $executable),
+                $this->twitchCliPath,
+                true
+            );
+
+            $filesystem->remove(sprintf('%s/%s', dirname($this->twitchCliPath), $baseName));
         } catch (\Exception $e) {
             $output->writeln('<error>Extract failed !</error>');
             return Command::FAILURE;
         }
 
-
-
-        $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $executable));
-
-        $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $filename));
-
-        $filesystem->rename(
-            sprintf('%s/%s/%s', $this->twitchCliDir, $baseName, $executable),
-            sprintf('%s/%s', $this->twitchCliDir, $executable)
-        );
-
-        $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $baseName));
-
         $output->writeln('');
 
-        $output->writeln('<comment>Twitch Cli downloaded !</comment>');
+        $output->writeln('<info>Twitch Cli downloaded !</info>');
 
-        $process = new Process([sprintf('%s/%s', $this->twitchCliDir, $executable)]);
-        $process->run();
+        $output->writeln('<comment>Generating fixtures...</comment>');
 
-        if (!$process->isSuccessful()) {
-            $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $executable));
+        $process = new Process([sprintf('./%s', basename($this->twitchCliPath)), 'mock-api', 'generate'], dirname($this->twitchCliPath));
+        $process->start();
+
+        $clientId = null;
+        $secret = null;
+
+        $process->wait(function ($type, $buffer) use ($output, &$clientId, &$secret) {
+            if (preg_match('/Client-ID: (?<clientId>[0-9a-zA-Z]+)/', $buffer, $matches)) {
+                $clientId = $matches['clientId'];
+            }
+
+            if (preg_match('/Secret: (?<secret>[0-9a-zA-Z]+)/', $buffer, $matches)) {
+                $secret = $matches['secret'];
+            }
+        });
+
+        if (!$process->isSuccessful() || null === $clientId || null === $secret) {
+            $filesystem->remove($this->twitchCliPath);
             $output->writeln('<error>Twitch Cli is not working !</error>');
             return Command::FAILURE;
         }
 
-        $output->writeln('<info>Twitch Cli is now functional !</info>');
+        $output->writeln(sprintf('<comment>Your fake Twitch Client ID : %s</comment>', $clientId));
+        $output->writeln(sprintf('<comment>Your fake Twitch Client Secret : %s</comment>', $secret));
+
+        $output->writeln('<info>You can now start the Mock server :</info>');
+        $output->writeln('    <comment>php bin/console twitch:server:start</comment>');
 
         return Command::SUCCESS;
     }

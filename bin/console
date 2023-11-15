@@ -7,10 +7,10 @@ require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\HttpClient\HttpClient;
-use TBoileau\TwitchApi\Command\GetTwitchCliCommand;
+use TBoileau\TwitchApi\Command\InstallTwitchCliCommand;
 
 $application = new Application();
 
-$application->add(new GetTwitchCliCommand(HttpClient::create(), __DIR__.'/../var'));
+$application->add(new InstallTwitchCliCommand(HttpClient::create(), __DIR__.'/../var/twitch'));
 
 $application->run();
