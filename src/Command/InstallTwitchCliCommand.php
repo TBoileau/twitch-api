@@ -157,7 +157,7 @@ final class InstallTwitchCliCommand extends Command
         });
 
         if (!$process->isSuccessful() || null === $clientId || null === $secret) {
-//            $filesystem->remove($this->twitchCliPath);
+            $filesystem->remove($this->twitchCliPath);
             $output->writeln('<error>Twitch Cli is not working !</error>');
             return Command::FAILURE;
         }
