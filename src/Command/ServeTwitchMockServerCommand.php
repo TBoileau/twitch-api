@@ -31,7 +31,7 @@ final class ServeTwitchMockServerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $process = new Process([$this->twitchCliPath, 'mock-api', 'start', '-p', $this->twitchMockServerPort]);
+        $process = new Process([$this->twitchCliPath, 'mock-api', 'start', '-p', $this->twitchMockServerPort], timeout: null);
 
         $process->start();
 
