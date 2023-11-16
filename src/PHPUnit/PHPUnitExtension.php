@@ -49,10 +49,6 @@ final class PHPUnitExtension implements Extension
              */
             public function notify(Event $event): void
             {
-                if ($event->testSuite()->name() !== 'Api' || null === $this->pid) {
-                    return;
-                }
-
                 $process = new Process(['kill', '-9', $this->pid]);
 
                 $process->run();
