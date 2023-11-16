@@ -29,7 +29,7 @@ final class InstallTwitchCliCommand extends Command
 
     protected static $defaultName = 'twitch:install';
 
-    public function __construct(private readonly HttpClientInterface $httpClient, private readonly string $twitchCliPath)
+    public function __construct(private readonly HttpClientInterface $httpClient, private readonly string $twitchCliDir)
     {
         parent::__construct();
     }
@@ -74,11 +74,40 @@ final class InstallTwitchCliCommand extends Command
         }
 
         $baseName = sprintf('twitch-cli_%s_%s', $release, $distribution);
-
         $filename = sprintf('%s%s', $baseName, self::TWITCH_CLI_DISTRIBUTIONS[$distribution]['ext']);
-
         $executable = self::TWITCH_CLI_DISTRIBUTIONS[$distribution]['filename'];
+        $twitchCliPath = sprintf('%s/%s', $this->twitchCliDir, $executable);
 
+        try {
+            $tempFilename = $this->download($release, $filename, $output);
+
+            $output->writeln('');
+            $output->writeln('<info>Twitch Cli downloaded !</info>');
+            $output->writeln('<comment>Extraction...</comment>');
+
+            $this->extract($tempFilename, $baseName, $executable, $twitchCliPath);
+
+            $output->writeln('');
+            $output->writeln('<info>Twitch Cli extracted !</info>');
+            $output->writeln('<comment>Generating fixtures...</comment>');
+
+            ['clientId' => $clientId, 'secret' => $secret] = $this->generateFixtures($executable);
+
+            $output->writeln('');
+            $output->writeln(sprintf('<comment>Your fake Twitch Client ID : %s</comment>', $clientId));
+            $output->writeln(sprintf('<comment>Your fake Twitch Client Secret : %s</comment>', $secret));
+            $output->writeln('<info>You can now start the Mock server :</info>');
+            $output->writeln('    <comment>php bin/console twitch:serve</comment>');
+        } catch (\Exception $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
+    }
+
+    private function download(string $release, string $filename, OutputInterface $output): string
+    {
         $url = sprintf(
             'https://github.com/twitchdev/twitch-cli/releases/download/v%s/%s',
             $release,
@@ -97,8 +126,7 @@ final class InstallTwitchCliCommand extends Command
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            $output->writeln('<error>Download failed !</error>');
-            return Command::FAILURE;
+            throw new \HttpResponseException('Download failed !');
         }
 
         $tempFilename = sprintf('%s/%s', sys_get_temp_dir(), $filename);
@@ -111,42 +139,42 @@ final class InstallTwitchCliCommand extends Command
 
         $progressBar->finish();
 
+        return $tempFilename;
+    }
+
+    private function extract(string $tempFilename, string $baseName, string $executable, string $twitchCliPath): void
+    {
         $filesystem = new Filesystem();
 
-        try {
-            if ($filesystem->exists($this->twitchCliPath)) {
-                $filesystem->remove($this->twitchCliPath);
-            }
-
-            $phar = new PharData($tempFilename);
-
-            $phar->extractTo(dirname($this->twitchCliPath), sprintf('%s/%s', $baseName, $executable), true);
-
-            $filesystem->rename(
-                sprintf('%s/%s/%s', dirname($this->twitchCliPath), $baseName, $executable),
-                $this->twitchCliPath,
-                true
-            );
-
-            $filesystem->remove(sprintf('%s/%s', dirname($this->twitchCliPath), $baseName));
-        } catch (\Exception $e) {
-            $output->writeln('<error>Extract failed !</error>');
-            return Command::FAILURE;
+        if ($filesystem->exists($this->twitchCliDir)) {
+            $filesystem->remove($this->twitchCliDir);
         }
 
-        $output->writeln('');
+        $phar = new PharData($tempFilename);
 
-        $output->writeln('<info>Twitch Cli downloaded !</info>');
+        $phar->extractTo($this->twitchCliDir, sprintf('%s/%s', $baseName, $executable), true);
 
-        $output->writeln('<comment>Generating fixtures...</comment>');
+        $filesystem->rename(
+            sprintf('%s/%s/%s', $this->twitchCliDir, $baseName, $executable),
+            $twitchCliPath,
+            true
+        );
 
-        $process = new Process([sprintf('./%s', basename($this->twitchCliPath)), 'mock-api', 'generate'], dirname($this->twitchCliPath));
+        $filesystem->remove(sprintf('%s/%s', $twitchCliPath, $baseName));
+    }
+
+    /**
+     * @return array{clientId: string, secret: string}
+     */
+    private function generateFixtures(string $executable): array
+    {
+        $process = new Process([sprintf('./%s', $executable), 'mock-api', 'generate'], $this->twitchCliDir);
         $process->start();
 
         $clientId = null;
         $secret = null;
 
-        $process->wait(function ($type, $buffer) use ($output, &$clientId, &$secret) {
+        $process->wait(function ($type, $buffer) use (&$clientId, &$secret) {
             if (preg_match('/Client-ID: (?<clientId>[0-9a-zA-Z]+)/', $buffer, $matches)) {
                 $clientId = $matches['clientId'];
             }
@@ -157,17 +185,9 @@ final class InstallTwitchCliCommand extends Command
         });
 
         if (!$process->isSuccessful() || null === $clientId || null === $secret) {
-            $filesystem->remove($this->twitchCliPath);
-            $output->writeln('<error>Twitch Cli is not working !</error>');
-            return Command::FAILURE;
+            throw new \RuntimeException('Twitch Cli is not working !');
         }
 
-        $output->writeln(sprintf('<comment>Your fake Twitch Client ID : %s</comment>', $clientId));
-        $output->writeln(sprintf('<comment>Your fake Twitch Client Secret : %s</comment>', $secret));
-
-        $output->writeln('<info>You can now start the Mock server :</info>');
-        $output->writeln('    <comment>php bin/console twitch:serve</comment>');
-
-        return Command::SUCCESS;
+        return ['clientId' => $clientId, 'secret' => $secret];
     }
 }
