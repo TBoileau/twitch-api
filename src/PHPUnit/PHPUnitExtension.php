@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TBoileau\TwitchApi\PHPUnit;
 
 use PHPUnit\Event\Event;
-use PHPUnit\Event\TestSuite\Finished;
-use PHPUnit\Event\TestSuite\FinishedSubscriber;
-use PHPUnit\Event\TestSuite\Started;
-use PHPUnit\Event\TestSuite\StartedSubscriber;
+use PHPUnit\Event\TestRunner\Finished;
+use PHPUnit\Event\TestRunner\FinishedSubscriber;
+use PHPUnit\Event\TestRunner\Started;
+use PHPUnit\Event\TestRunner\StartedSubscriber;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
@@ -31,10 +31,6 @@ final class PHPUnitExtension implements Extension
              */
             public function notify(Event $event): void
             {
-                if ($event->testSuite()->name() !== 'Api') {
-                    return;
-                }
-
                 $process = new Process(['php', 'bin/console', 'twitch:serve']);
 
                 $this->pid = $process->getPid();
