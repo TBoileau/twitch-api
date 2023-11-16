@@ -20,7 +20,7 @@ final class PHPUnitExtension implements Extension
     private Process $process;
     public function __construct()
     {
-        $this->process = new Process(['php', 'bin/console', 'twitch:serve', '-p', $_ENV['TWITCH_MOCK_SERVER_PORT']]);
+        $this->process = new Process(['php', 'bin/console', 'twitch:serve', '-p', $_ENV['TWITCH_MOCK_SERVER_PORT'] ?? 8080]);
     }
 
     public function bootstrap(Configuration $configuration, Facade $facade, ParameterCollection $parameters): void
