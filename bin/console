@@ -13,6 +13,6 @@ use TBoileau\TwitchApi\Command\ServeTwitchMockServerCommand;
 $application = new Application();
 
 $application->add(new InstallTwitchCliCommand(HttpClient::create(), __DIR__.'/../var'));
-$application->add(new ServeTwitchMockServerCommand(__DIR__.'/../var/twitch.exe', 8080));
+$application->add(new ServeTwitchMockServerCommand(__DIR__.'/../var/twitch', 8080));
 
 $application->run();

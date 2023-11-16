@@ -19,7 +19,4 @@
       <directory suffix=".php">src/PHPUnit</directory>
     </exclude>
   </source>
-  <extensions>
-    <bootstrap class="TBoileau\TwitchApi\PHPUnit\PHPUnitExtension" />
-  </extensions>
 </phpunit>

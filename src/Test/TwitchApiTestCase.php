@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TBoileau\TwitchApi\PHPUnit;
+namespace TBoileau\TwitchApi\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -14,8 +14,6 @@ use TBoileau\TwitchApi\Api\TwitchApiInterface;
 
 abstract class TwitchApiTestCase extends TestCase
 {
-    protected ?HttpClientInterface $httpClient = null;
-
     protected ?string $userId = null;
 
     protected ?TwitchApiInterface $twitchApi = null;
@@ -28,7 +26,7 @@ abstract class TwitchApiTestCase extends TestCase
     protected function createApi(): void
     {
         $httpClient = HttpClient::create()->withOptions([
-            'base_uri' => sprintf('http://localhost:%s/mock/', $_ENV['PORT'] ?? 8080),
+            'base_uri' => sprintf('http://%s:%s/mock/', $_ENV['TWITCH_MOCK_SERVER_HOST'] ?? 'localhost', $_ENV['TWITCH_MOCK_SERVER_PORT'] ?? 8080),
         ]);
 
         $this->authorize($httpClient);

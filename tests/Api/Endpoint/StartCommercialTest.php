@@ -6,7 +6,7 @@ namespace TBoileau\TwitchApi\Tests\Api\Endpoint;
 
 use PHPUnit\Framework\Attributes\Test;
 use TBoileau\TwitchApi\Api\Endpoint\StartCommercial;
-use TBoileau\TwitchApi\PHPUnit\TwitchApiTestCase;
+use TBoileau\TwitchApi\Test\TwitchApiTestCase;
 
 final class StartCommercialTest extends TwitchApiTestCase
 {

@@ -35,4 +35,5 @@ jobs:
           composer valid
       - name: Tests
         run: |
+          php bin/console twitch:serve &
           vendor/bin/phpunit
