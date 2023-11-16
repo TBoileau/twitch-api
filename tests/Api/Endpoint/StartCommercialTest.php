@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace TBoileau\TwitchApi\Tests\Api\Endpoint;
 
+use PHPUnit\Framework\Attributes\Test;
 use TBoileau\TwitchApi\Api\Endpoint\StartCommercial;
 use TBoileau\TwitchApi\PHPUnit\TwitchApiTestCase;
 
 final class StartCommercialTest extends TwitchApiTestCase
 {
-    /**
-     * @test
-     */
+    #[Test]
     public function shouldSuccessfullyStartCommercial(): void
     {
         $this->createApi();
