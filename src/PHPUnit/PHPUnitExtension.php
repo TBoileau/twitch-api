@@ -17,12 +17,16 @@ use Symfony\Component\Process\Process;
 
 final class PHPUnitExtension implements Extension
 {
-    private ?int $pid = null;
+    private Process $process;
+    public function __construct()
+    {
+        $this->process = new Process(['php', 'bin/console', 'twitch:serve', '-p', $_ENV['TWITCH_MOCK_SERVER_PORT']]);
+    }
 
     public function bootstrap(Configuration $configuration, Facade $facade, ParameterCollection $parameters): void
     {
-        $facade->registerSubscriber(new class($this->pid) implements StartedSubscriber {
-            public function __construct(private ?int &$pid)
+        $facade->registerSubscriber(new class($this->process) implements StartedSubscriber {
+            public function __construct(private Process $process)
             {
             }
 
@@ -31,16 +35,12 @@ final class PHPUnitExtension implements Extension
              */
             public function notify(Event $event): void
             {
-                $process = new Process(['php', 'bin/console', 'twitch:serve']);
-
-                $this->pid = $process->getPid();
-
-                $process->start();
+                $this->process->start();
             }
         });
 
-        $facade->registerSubscriber(new class($this->pid) implements FinishedSubscriber {
-            public function __construct(private ?int $pid)
+        $facade->registerSubscriber(new class($this->process) implements FinishedSubscriber {
+            public function __construct(private Process $process)
             {
             }
 
@@ -49,9 +49,7 @@ final class PHPUnitExtension implements Extension
              */
             public function notify(Event $event): void
             {
-                $process = new Process(['kill', '-9', $this->pid]);
-
-                $process->run();
+                $this->process->stop();
             }
         });
     }
