@@ -126,7 +126,7 @@ final class InstallTwitchCliCommand extends Command
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new \HttpResponseException('Download failed !');
+            throw new \Exception('Download failed !');
         }
 
         $tempFilename = sprintf('%s/%s', sys_get_temp_dir(), $filename);
