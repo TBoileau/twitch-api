@@ -6,13 +6,11 @@ namespace TBoileau\TwitchApi\Api\Endpoint;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class StartCommercial implements ProcessorInterface
+class StartCommercial implements EndpointInterface
 {
-    private const URI = 'channels/commercial';
+    use EndpointHttpTrait;
 
-    public function __construct(private HttpClientInterface $httpClient)
-    {
-    }
+    private const URI = 'channels/commercial';
 
     public function supports(string $uri): bool
     {
@@ -25,15 +23,13 @@ final class StartCommercial implements ProcessorInterface
     }
 
     /**
-     * @param array{broadcaster_id: string, length: int} $body
-     * @param array<empty, empty> $query
+     *
+     * @param array{json: array{broadcaster_id: string, length: int}, query: array<empty, empty>} $options
      * @return array{data: array<array-key, array{length: int, message: string, retry_after: int}>}
      */
-    public function process(array $body = [], array $query = []): array
+    public function call(array $options = []): array
     {
-        return $this->httpClient->request('POST', self::URI, [
-            'json' => $body,
-            'query' => $query,
-        ])->toArray();
+
+        return $this->httpClient->request('POST', self::URI, $options)->toArray();
     }
 }

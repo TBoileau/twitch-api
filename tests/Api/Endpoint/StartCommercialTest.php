@@ -14,15 +14,13 @@ final class StartCommercialTest extends TwitchApiTestCase
      */
     public function shouldSuccessfullyStartCommercial(): void
     {
-        $this->createHttpClient();
+        $this->createApi();
 
-        ['user_id' => $userId] = $this->authorize();
-
-        $startCommercial = new StartCommercial(static::$httpClient);
-
-        $response = $startCommercial->process([
-            'broadcaster_id' => $userId,
-            'length' => 30,
+        $response = $this->call(StartCommercial::class, [
+            'json' => [
+                'broadcaster_id' => $this->userId,
+                'length' => 30,
+            ]
         ]);
 
         self::assertIsArray($response);

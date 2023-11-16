@@ -9,4 +9,6 @@ interface EndpointInterface
     public function supports(string $uri): bool;
 
     public static function getScope(): string;
+
+    public function call(array $options): mixed;
 }
