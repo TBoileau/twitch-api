@@ -1,9 +1,5 @@
 name: Continuous integration
 on: [push]
-env:
-  TWITCH_MOCK_SERVER_PORT: 8080
-  TWITCH_CLI_DISTRIBUTION: Windows_x86_64
-  TWITCH_CLI_VERSION: 1.1.21"
 jobs:
   ci:
     name: Continuous Integration
