@@ -166,7 +166,7 @@ final class InstallTwitchCliCommand extends Command
         $output->writeln(sprintf('<comment>Your fake Twitch Client Secret : %s</comment>', $secret));
 
         $output->writeln('<info>You can now start the Mock server :</info>');
-        $output->writeln('    <comment>php bin/console twitch:server:start</comment>');
+        $output->writeln('    <comment>php bin/console twitch:serve</comment>');
 
         return Command::SUCCESS;
     }
