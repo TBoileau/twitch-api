@@ -27,7 +27,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Build
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: |
+          composer install --prefer-dist --no-progress --no-suggest
+          php bin/console twitch:install
       - name: Quality
         run: |
           composer valid

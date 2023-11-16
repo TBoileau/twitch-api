@@ -1,3 +1,4 @@
 /vendor/
 /var/
 /.phpunit.cache/
+phpunit.xml
