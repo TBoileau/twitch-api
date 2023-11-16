@@ -6,11 +6,8 @@
     <server name="SHELL_VERBOSITY" value="-1"/>
   </php>
   <testsuites>
-    <testsuite name="Commands">
-      <directory>tests/Command</directory>
-    </testsuite>
-    <testsuite name="Api">
-      <directory>tests/Api</directory>
+    <testsuite name="Library test suite">
+      <directory>tests</directory>
     </testsuite>
   </testsuites>
   <coverage/>

@@ -68,7 +68,7 @@ final class InstallTwitchCliCommandTest extends TestCase
     {
         $command = $this->application->find('twitch:install');
         $commandTester = new CommandTester($command);
-        $commandTester->execute([]);
+        $commandTester->execute(['-d' => $_ENV['TWITCH_CLI_DISTRIBUTION'] ?? 'Linux_x86_64', '-r' => $_ENV['TWITCH_CLI_VERSION'] ?? '1.1.21']);
         $commandTester->assertCommandIsSuccessful();
     }
 
