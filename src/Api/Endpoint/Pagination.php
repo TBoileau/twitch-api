@@ -4,22 +4,26 @@ declare(strict_types=1);
 
 namespace TBoileau\TwitchApi\Api\Endpoint;
 
-use Exception;
+use ArrayIterator;
+use Closure;
+use Countable;
+use IteratorAggregate;
 use Traversable;
 
 /**
  * @template T
  */
-class Pagination implements \IteratorAggregate, \Countable
+class Pagination implements IteratorAggregate, Countable
 {
     /**
      * @param T[] $data
      */
     public function __construct(
-        private array $data,
-        private int $total,
-        private ?\Closure $next = null
-    ) {
+        private array     $data,
+        private int       $total,
+        private ?Closure $next = null
+    )
+    {
     }
 
     /**
@@ -27,7 +31,7 @@ class Pagination implements \IteratorAggregate, \Countable
      */
     public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->data);
+        return new ArrayIterator($this->data);
     }
 
     public function count(): int

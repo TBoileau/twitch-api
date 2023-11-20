@@ -10,10 +10,15 @@ abstract class AbstractOperations
 {
     protected HttpClientInterface $httpClient;
 
+    abstract public static function getName(): string;
+
+    /**
+     * @return array<string>
+     */
+    abstract public static function getScopes(): array;
+
     public function setHttpClient(HttpClientInterface $httpClient): void
     {
         $this->httpClient = $httpClient;
     }
-
-    abstract public static function getName(): string;
 }

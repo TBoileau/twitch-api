@@ -6,44 +6,69 @@ namespace TBoileau\TwitchApi\Tests\Api;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-
-use Symfony\Component\HttpClient\HttpClient;
 use TBoileau\TwitchApi\Api\Endpoint\AbstractOperations;
+use TBoileau\TwitchApi\Api\Endpoint\Bits\BitsOperations;
+use TBoileau\TwitchApi\Api\Endpoint\Bits\Leaderboard;
 use TBoileau\TwitchApi\Api\Endpoint\Channel\ChannelOperations;
 use TBoileau\TwitchApi\Api\TwitchApi;
+use TBoileau\TwitchApi\Test\TwitchApiTestCase;
 
-class TwitchApiTest extends TestCase
+class TwitchApiTest extends TwitchApiTestCase
 {
-    private TwitchApi $twitchApi;
-
-    protected function setUp(): void
+    public function setUp(): void
     {
-        $channelOperations = new ChannelOperations();
+        $this->createApi();
+    }
 
-        $channelOperations->setHttpClient(HttpClient::create());
+    #[Test]
+    public function shouldThrowExceptionIfOperationDoesNotExist(): void
+    {
+        $twitchApi = new TwitchApi([]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The operation "Foo" does not exist.');
+        $twitchApi->Foo;
+    }
 
-        $this->twitchApi = new TwitchApi([
-            $channelOperations::getName() => $channelOperations,
-        ]);
+    #[Test]
+    public function shouldThrowExceptionIfOperationIsNotAnInstanceOfAbstractOperations(): void
+    {
+        $twitchApi = new TwitchApi(['Foo' => new \stdClass()]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The operation "Foo" is not an instance of "%s".', AbstractOperations::class));
+        $twitchApi->Foo;
     }
 
     /**
      * @param class-string<AbstractOperations> $operationsClass
-     * @return void
      */
     #[Test]
-    #[DataProvider('provideOperations')]
-    public function shouldReturnGroupOfOperations(string $operationsClass): void
+    #[DataProvider('provideGroupsOperations')]
+    public function shouldReturnOperations(string $operationsClass, string $operationName): void
     {
-        $this->assertInstanceOf($operationsClass, $this->twitchApi->Channel);
+        $this->assertInstanceOf($operationsClass, $this->twitchApi->$operationName);
     }
 
     /**
-     * @return \Generator<string, array{class-string<AbstractOperations>}>
+     * @return \Generator<array{class-string<AbstractOperations>, string}>
      */
+    public static function provideGroupsOperations(): \Generator
+    {
+        yield [ChannelOperations::class, 'Channel'];
+        yield [BitsOperations::class, 'Bits'];
+    }
+
+    #[Test]
+    #[DataProvider('provideOperations')]
+    public function shouldCallOperation(\Closure $operation): void
+    {
+        $operation->call($this);
+    }
+
     public static function provideOperations(): \Generator
     {
-        yield 'Channel' => [ChannelOperations::class];
+        yield 'Get Bits Leaderboard' => [function (): void {
+            $leaderboard = $this->call('Bits::getLeaderboard');
+            self::assertInstanceOf(Leaderboard::class, $leaderboard);
+        }];
     }
 }

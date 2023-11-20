@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace TBoileau\TwitchApi\Command;
 
+use Exception;
 use PharData;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -98,7 +100,7 @@ final class InstallTwitchCliCommand extends Command
             $output->writeln(sprintf('<comment>Your fake Twitch Client Secret : %s</comment>', $secret));
             $output->writeln('<info>You can now start the Mock server :</info>');
             $output->writeln('    <comment>php bin/console twitch:serve</comment>');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             return Command::FAILURE;
         }
@@ -126,7 +128,7 @@ final class InstallTwitchCliCommand extends Command
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            throw new \Exception('Download failed !');
+            throw new Exception('Download failed !');
         }
 
         $tempFilename = sprintf('%s/%s', sys_get_temp_dir(), $filename);
@@ -185,7 +187,7 @@ final class InstallTwitchCliCommand extends Command
         });
 
         if (!$process->isSuccessful() || null === $clientId || null === $secret) {
-            throw new \RuntimeException('Twitch Cli is not working !');
+            throw new RuntimeException('Twitch Cli is not working !');
         }
 
         return ['clientId' => $clientId, 'secret' => $secret];
