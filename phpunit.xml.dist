@@ -4,6 +4,11 @@
     <ini name="display_errors" value="1"/>
     <ini name="error_reporting" value="-1"/>
     <server name="SHELL_VERBOSITY" value="-1"/>
+    <env name="TWITCH_MOCK_SERVER_PORT" value="8080"/>
+    <env name="TWITCH_API_HOST" value="http://localhost:8080"/>
+    <env name="TWITCH_API_BASE_URI" value="/mock/"/>
+    <env name="TWITCH_CLI_DISTRIBUTION" value="Linux_x86_64"/>
+    <env name="TWITCH_CLI_VERSION" value="1.1.21"/>
   </php>
   <testsuites>
     <testsuite name="Library test suite">
