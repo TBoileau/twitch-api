@@ -30,7 +30,7 @@ jobs:
         run: |
           composer install --prefer-dist --no-progress --no-suggest
           php bin/console twitch:install
-          php bin/console twitch:serve
+          php bin/console twitch:serve &
       - name: Quality
         run: |
           composer valid
