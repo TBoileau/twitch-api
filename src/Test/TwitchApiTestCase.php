@@ -56,8 +56,7 @@ abstract class TwitchApiTestCase extends TestCase
                 sprintf('%s%s', $_ENV['TWITCH_API_HOST'], $_ENV['TWITCH_API_BASE_URI']),
                 $token['access_token'],
                 $clients['data'][0]['ID']
-            ),
-            $groupsOfOperations
+            )
         );
     }
 
