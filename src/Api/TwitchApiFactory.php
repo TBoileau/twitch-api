@@ -5,22 +5,30 @@ declare(strict_types=1);
 namespace TBoileau\TwitchApi\Api;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use TBoileau\TwitchApi\Api\Endpoint\AbstractOperations;
+use TBoileau\TwitchApi\Api\Endpoint\Bits\BitsOperations;
+use TBoileau\TwitchApi\Api\Endpoint\Channel\ChannelOperations;
 
 final class TwitchApiFactory
 {
-    /**
-     * @param HttpClientInterface $httpClient
-     * @param array<string, AbstractOperations> $groupsOfOperations
-     * @return TwitchApiInterface
-     */
-    public static function create(HttpClientInterface $httpClient, array $groupsOfOperations): TwitchApiInterface
-    {
-        array_walk(
-            $groupsOfOperations,
-            fn(AbstractOperations $operations) => $operations->setHttpClient($httpClient)
-        );
+    public const OPERATIONS = [
+        ChannelOperations::class,
+        BitsOperations::class,
+    ];
 
-        return new TwitchApi($groupsOfOperations);
+    public static function create(HttpClientInterface $httpClient): TwitchApiInterface
+    {
+        return new TwitchApi(
+            array_merge(
+                ...array_map(
+                    function (string $operationsClass) use ($httpClient): array {
+                        $operations = new $operationsClass();
+                        $operations->setHttpClient($httpClient);
+
+                        return [$operations::getName() => $operations];
+                    },
+                    self::OPERATIONS
+                )
+            )
+        );
     }
 }

@@ -162,7 +162,7 @@ final class InstallTwitchCliCommand extends Command
             true
         );
 
-        $filesystem->remove(sprintf('%s/%s', $twitchCliPath, $baseName));
+        $filesystem->remove(sprintf('%s/%s', $this->twitchCliDir, $baseName));
     }
 
     /**
