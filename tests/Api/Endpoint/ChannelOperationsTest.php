@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TBoileau\TwitchApi\Tests\Api\Endpoint;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -12,7 +13,8 @@ use TBoileau\TwitchApi\Api\Endpoint\Channel\Follower;
 
 class ChannelOperationsTest extends TestCase
 {
-    public function testGetFollowers(): void
+    #[Test]
+    public function shouldGetFollowers(): void
     {
         $channelOperations = new ChannelOperations();
 

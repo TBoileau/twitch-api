@@ -36,4 +36,9 @@ class ChannelOperations extends AbstractOperations
                 )
         );
     }
+
+    public static function getName(): string
+    {
+        return 'Channel';
+    }
 }

@@ -14,4 +14,6 @@ abstract class AbstractOperations
     {
         $this->httpClient = $httpClient;
     }
+
+    abstract public static function getName(): string;
 }
