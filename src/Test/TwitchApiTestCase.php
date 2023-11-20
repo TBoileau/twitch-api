@@ -28,9 +28,6 @@ abstract class TwitchApiTestCase extends TestCase
         /** @var array{data: non-empty-array<array-key, array{id: string}>} $clients */
         $users = $httpClient->request('GET', '/units/users')->toArray();
 
-        /** @var array<string, AbstractOperations> $groupsOfOperations */
-        $groupsOfOperations = require __DIR__ . '/../Resources/api.php';
-
         $this->userId = $users['data'][0]['id'];
 
         /** @var array{access_token: string} $clients */
@@ -43,8 +40,11 @@ abstract class TwitchApiTestCase extends TestCase
                 'scope' => implode(
                     ' ',
                     array_map(
-                        fn(AbstractOperations $operations): string => implode(' ', $operations::getScopes()),
-                        $groupsOfOperations
+                        /**
+                         * @param class-string<AbstractOperations> $operations
+                         */
+                        fn(string $operations): string => implode(' ', $operations::getScopes()),
+                        TwitchApiFactory::OPERATIONS
                     )
                 )
             ]
