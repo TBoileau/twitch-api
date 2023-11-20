@@ -18,7 +18,7 @@ class Pagination implements \IteratorAggregate, \Countable
     public function __construct(
         private array $data,
         private int $total,
-        private \Closure $next
+        private ?\Closure $next = null
     ) {
     }
 
@@ -35,8 +35,12 @@ class Pagination implements \IteratorAggregate, \Countable
         return $this->total;
     }
 
-    public function next(): static
+    public function next(): ?static
     {
+        if ($this->next === null) {
+            return null;
+        }
+
         return ($this->next)();
     }
 }
