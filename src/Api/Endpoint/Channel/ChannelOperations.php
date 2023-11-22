@@ -37,7 +37,7 @@ class ChannelOperations extends AbstractOperations
         return new Pagination(
             data: array_map(
                 fn(array $follower): Follower => new Follower(
-                    DateTimeImmutable::createFromFormat('U', $follower['followed_at']),
+                    new DateTimeImmutable($follower['followed_at']),
                     $follower['user_id'],
                     $follower['user_login'],
                     $follower['user_name']

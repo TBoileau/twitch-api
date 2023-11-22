@@ -7,11 +7,11 @@ namespace TBoileau\TwitchApi\Api\Endpoint\Bits;
 class Leader
 {
     public function __construct(
-        string $userId,
-        string $userLogin,
-        string $userName,
-        int    $rank,
-        int    $score,
+        public string $userId,
+        public string $userLogin,
+        public string $userName,
+        public int    $rank,
+        public int    $score,
     )
     {
     }

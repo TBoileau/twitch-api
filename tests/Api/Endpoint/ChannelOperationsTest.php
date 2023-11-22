@@ -23,7 +23,7 @@ class ChannelOperationsTest extends TestCase
                 0,
                 30,
                 [
-                    'followed_at' => (string) time(),
+                    'followed_at' => '2021-01-01T00:00:00Z',
                     'user_id' => '1',
                     'user_login' => 'foo',
                     'user_name' => 'bar'
