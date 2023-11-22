@@ -10,10 +10,16 @@ use TBoileau\TwitchApi\Api\Endpoint\AbstractOperations;
 class TwitchApi implements TwitchApiInterface
 {
     /**
-     * @param array<string, AbstractOperations> $operations
+     * @var array<string, AbstractOperations>
      */
-    public function __construct(private iterable $operations = [])
+    private array $operations;
+
+    /**
+     * @param iterable<string, AbstractOperations> $operations
+     */
+    public function __construct(iterable $operations = [])
     {
+        $this->operations = iterator_to_array($operations);
     }
 
     public function __get(string $name): AbstractOperations
