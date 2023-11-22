@@ -50,14 +50,7 @@ abstract class TwitchApiTestCase extends TestCase
             ]
         ])->toArray(false);
 
-        $this->twitchApi = TwitchApiFactory::create(
-            new \TBoileau\TwitchApi\HttpClient(
-                $httpClient,
-                sprintf('%s%s', $_ENV['TWITCH_API_HOST'], $_ENV['TWITCH_API_BASE_URI']),
-                $token['access_token'],
-                $clients['data'][0]['ID']
-            )
-        );
+        $this->twitchApi = TwitchApiFactory::create($token['access_token'], $clients['data'][0]['ID']);
     }
 
     protected function call(string $operationName, array $parameters = []): mixed

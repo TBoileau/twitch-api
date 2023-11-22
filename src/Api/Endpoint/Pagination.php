@@ -21,9 +21,9 @@ class Pagination implements IteratorAggregate, Countable
     public function __construct(
         private array     $data,
         private int       $total,
-        private ?Closure $next = null
-    )
-    {
+        private ?Closure $next = null,
+        private ?Closure $previous = null
+    ) {
     }
 
     /**
@@ -46,5 +46,14 @@ class Pagination implements IteratorAggregate, Countable
         }
 
         return ($this->next)();
+    }
+
+    public function previous()
+    {
+        if ($this->previous === null) {
+            return null;
+        }
+
+        return ($this->previous)();
     }
 }

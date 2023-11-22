@@ -50,19 +50,8 @@ $ php bin/console twitch:serve
 <?php
 
 use TBoileau\TwitchApi\Api\TwitchApiFactory;
-use TBoileau\TwitchApi\HttpClient;
-use Symfony\Component\HttpClient\HttpClient as BaseHttpClient;
 
-$twitchApi = TwitchApiFactory::create(
-    new HttpClient(
-         BaseHttpClient::create([
-            'base_uri' => $_ENV['TWITCH_API_HOST'],
-        ]);,
-        sprintf('%s%s', $_ENV['TWITCH_API_HOST'], $_ENV['TWITCH_API_BASE_URI']),
-        $accessToken,
-        $_ENV['TWITCH_API_CLIENT_ID']
-    )
-);
+$twitchApi = TwitchApiFactory::create($accessToken, $_ENV['TWITCH_API_CLIENT_ID']);
 
 $leaderboard = $twitchApi->Bits->getLeaderboard();
 ```
