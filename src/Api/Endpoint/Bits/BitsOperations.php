@@ -25,8 +25,7 @@ class BitsOperations extends AbstractOperations
         ?string            $period = null,
         ?DateTimeInterface $startedAt = null,
         ?string            $userId = null,
-    ): Leaderboard
-    {
+    ): Leaderboard {
         /** @var array{data: array<array-key, array{user_id: string, user_login: string, user_name: string, rank: int, score: int}>, date_range?: array{started_at: string, ended_at: string}, total: int} $response */
         $response = $this->httpClient->request('GET', 'bits/leaderboard', [
             'query' => [
