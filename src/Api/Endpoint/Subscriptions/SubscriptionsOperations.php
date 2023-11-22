@@ -33,7 +33,7 @@ class SubscriptionsOperations extends AbstractOperations
                 'after' => $after,
                 'before' => $before,
             ],
-        ])->toArray(false);
+        ])->toArray();
 
         return new Pagination(
             data: array_map(
