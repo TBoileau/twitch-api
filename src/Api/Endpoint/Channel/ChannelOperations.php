@@ -32,7 +32,7 @@ class ChannelOperations extends AbstractOperations
                 'first' => $first,
                 'after' => $after,
             ],
-        ])->toArray(false);
+        ])->toArray();
 
         return new Pagination(
             data: array_map(

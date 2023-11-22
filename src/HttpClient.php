@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TBoileau\TwitchApi;
 
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -40,7 +41,11 @@ class HttpClient implements HttpClientInterface
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        return $this->decoratedHttpClient->request($method, $url, $options);
+        try {
+            return $this->decoratedHttpClient->request($method, $url, $options);
+        } catch (ClientExceptionInterface $e) {
+            throw new TwitchUnauthorizedException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     public function stream(iterable|ResponseInterface $responses, float $timeout = null): ResponseStreamInterface
