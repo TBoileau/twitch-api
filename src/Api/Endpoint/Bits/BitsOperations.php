@@ -34,7 +34,7 @@ class BitsOperations extends AbstractOperations
                 'started_at' => $startedAt === null ? null : $startedAt->format('U'),
                 'user_id' => $userId,
             ],
-        ])->toArray(false);
+        ])->toArray();
 
         return new Leaderboard(
             array_map(
