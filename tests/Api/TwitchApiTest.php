@@ -10,6 +10,9 @@ use TBoileau\TwitchApi\Api\Endpoint\AbstractOperations;
 use TBoileau\TwitchApi\Api\Endpoint\Bits\BitsOperations;
 use TBoileau\TwitchApi\Api\Endpoint\Bits\Leaderboard;
 use TBoileau\TwitchApi\Api\Endpoint\Channel\ChannelOperations;
+use TBoileau\TwitchApi\Api\Endpoint\Pagination;
+use TBoileau\TwitchApi\Api\Endpoint\Subscriptions\Subscription;
+use TBoileau\TwitchApi\Api\Endpoint\Subscriptions\SubscriptionsOperations;
 use TBoileau\TwitchApi\Api\TwitchApi;
 use TBoileau\TwitchApi\Test\TwitchApiTestCase;
 
@@ -55,6 +58,7 @@ class TwitchApiTest extends TwitchApiTestCase
     {
         yield [ChannelOperations::class, 'Channel'];
         yield [BitsOperations::class, 'Bits'];
+        yield [SubscriptionsOperations::class, 'Subscriptions'];
     }
 
     #[Test]
@@ -69,6 +73,11 @@ class TwitchApiTest extends TwitchApiTestCase
         yield 'Get Bits Leaderboard' => [function (): void {
             $leaderboard = $this->call('Bits::getLeaderboard');
             self::assertInstanceOf(Leaderboard::class, $leaderboard);
+        }];
+        yield 'Get Broadcaster Subscriptions' => [function (): void {
+            $pagination = $this->call('Subscriptions::getBroadcasterSubscriptions', [$this->userId]);
+            self::assertInstanceOf(Pagination::class, $pagination);
+            self::assertContainsOnlyInstancesOf(Subscription::class, $pagination->getIterator());
         }];
     }
 }

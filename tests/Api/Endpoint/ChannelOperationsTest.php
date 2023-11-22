@@ -40,8 +40,7 @@ class ChannelOperationsTest extends TestCase
 
             $nextCursor = match ($cursor) {
                 'page-1' => 'page-2',
-                'page-2' => null,
-                default => 'page-2'
+                default => null
             };
 
             $responseData = [

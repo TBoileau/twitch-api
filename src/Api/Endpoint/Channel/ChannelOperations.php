@@ -24,26 +24,35 @@ class ChannelOperations extends AbstractOperations
     /**
      * @return Pagination<Follower>
      */
-    public function getFollowers(string $broadcasterId, int $first = 20, ?string $cursor = null): Pagination
+    public function getFollowers(string $broadcasterId, int $first = 20, ?string $after = null): Pagination
     {
         $response = $this->httpClient->request('GET', 'channels/followers', [
             'query' => [
                 'broadcaster_id' => $broadcasterId,
                 'first' => $first,
-                'after' => $cursor,
+                'after' => $after,
             ],
-        ])->toArray(false);
+        ])->toArray(false);;
 
         return new Pagination(
             data: array_map(
-                fn(array $follower): Follower => new Follower(new DateTimeImmutable($follower['followed_at']), $follower['user_id'], $follower['user_login'], $follower['user_name']),
+                fn(array $follower): Follower => new Follower(
+                    DateTimeImmutable::createFromFormat('U', $follower['followed_at']),
+                    $follower['user_id'],
+                    $follower['user_login'],
+                    $follower['user_name']
+                ),
                 $response['data']
             ),
             total: $response['total'],
             next: ($response['pagination'] ?? null) === null
                 ? null
                 : Closure::bind(
-                    fn(): Pagination => $this->getFollowers($broadcasterId, $first, $response['pagination']['cursor'] ?? null),
+                    fn(): Pagination => $this->getFollowers(
+                        $broadcasterId,
+                        $first,
+                        $response['pagination']['cursor'] ?? null
+                    ),
                     $this
                 )
         );
