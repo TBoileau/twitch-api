@@ -44,7 +44,9 @@ class HttpClient implements HttpClientInterface
         try {
             return $this->decoratedHttpClient->request($method, $url, $options);
         } catch (ClientExceptionInterface $e) {
-            throw new TwitchUnauthorizedException($e->getMessage(), $e->getCode(), $e);
+            if ($e->getResponse()->getStatusCode() === 401) {
+                throw new TwitchUnauthorizedException($e->getMessage(), $e->getCode(), $e);
+            }
         }
     }
 
