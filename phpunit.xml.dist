@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd" colors="true" bootstrap="vendor/autoload.php" cacheDirectory=".phpunit.cache">
+  <php>
+    <ini name="display_errors" value="1"/>
+    <ini name="error_reporting" value="-1"/>
+    <server name="SHELL_VERBOSITY" value="-1"/>
+    <env name="TWITCH_MOCK_SERVER_PORT" value="8080"/>
+    <env name="TWITCH_API_HOST" value="http://localhost:8080"/>
+    <env name="TWITCH_API_BASE_URI" value="/mock/"/>
+    <env name="TWITCH_CLI_DISTRIBUTION" value="Linux_x86_64"/>
+    <env name="TWITCH_CLI_VERSION" value="1.1.21"/>
+  </php>
+  <testsuites>
+    <testsuite name="Library test suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <coverage/>
+  <source>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+  </source>
+</phpunit>
