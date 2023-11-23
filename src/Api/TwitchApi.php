@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TBoileau\TwitchApi\Api;
 
 use InvalidArgumentException;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use TBoileau\TwitchApi\Api\Endpoint\AbstractOperations;
 
 class TwitchApi implements TwitchApiInterface
@@ -17,7 +18,7 @@ class TwitchApi implements TwitchApiInterface
     /**
      * @param iterable<string, AbstractOperations> $operations
      */
-    public function __construct(iterable $operations = [])
+    public function __construct(iterable $operations, private readonly HttpClientInterface $httpClient)
     {
         $this->operations = iterator_to_array($operations);
     }
@@ -32,6 +33,6 @@ class TwitchApi implements TwitchApiInterface
             throw new InvalidArgumentException(sprintf('The operation "%s" is not an instance of "%s".', $name, AbstractOperations::class));
         }
 
-        return $this->operations[$name];
+        return $this->operations[$name]->setHttpClient($this->httpClient);
     }
 }

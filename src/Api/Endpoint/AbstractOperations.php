@@ -8,7 +8,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class AbstractOperations
 {
-    protected HttpClientInterface $httpClient;
+    protected ?HttpClientInterface $httpClient = null;
 
     abstract public static function getName(): string;
 
@@ -17,8 +17,12 @@ abstract class AbstractOperations
      */
     abstract public static function getScopes(): array;
 
-    public function setHttpClient(HttpClientInterface $httpClient): void
+    public function setHttpClient(HttpClientInterface $httpClient): static
     {
-        $this->httpClient = $httpClient;
+        if ($this->httpClient === null) {
+            $this->httpClient = $httpClient;
+        }
+
+        return $this;
     }
 }
