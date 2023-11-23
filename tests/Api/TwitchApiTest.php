@@ -6,6 +6,7 @@ namespace TBoileau\TwitchApi\Tests\Api;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\HttpClient\MockHttpClient;
 use TBoileau\TwitchApi\Api\Endpoint\AbstractOperations;
 use TBoileau\TwitchApi\Api\Endpoint\Bits\BitsOperations;
 use TBoileau\TwitchApi\Api\Endpoint\Bits\Leaderboard;
@@ -26,7 +27,7 @@ class TwitchApiTest extends TwitchApiTestCase
     #[Test]
     public function shouldThrowExceptionIfOperationDoesNotExist(): void
     {
-        $twitchApi = new TwitchApi([]);
+        $twitchApi = new TwitchApi([], new MockHttpClient());
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The operation "Foo" does not exist.');
         $twitchApi->Foo;
@@ -35,7 +36,7 @@ class TwitchApiTest extends TwitchApiTestCase
     #[Test]
     public function shouldThrowExceptionIfOperationIsNotAnInstanceOfAbstractOperations(): void
     {
-        $twitchApi = new TwitchApi(['Foo' => new \stdClass()]);
+        $twitchApi = new TwitchApi(['Foo' => new \stdClass()], new MockHttpClient());
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('The operation "Foo" is not an instance of "%s".', AbstractOperations::class));
         $twitchApi->Foo;

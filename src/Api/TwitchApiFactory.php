@@ -30,15 +30,15 @@ final class TwitchApiFactory
         return new TwitchApi(
             array_merge(
                 ...array_map(
-                    function (string $operationsClass) use ($httpClient): array {
+                    function (string $operationsClass): array {
                         $operations = new $operationsClass();
-                        $operations->setHttpClient($httpClient);
 
                         return [$operations::getName() => $operations];
                     },
                     self::OPERATIONS
                 )
-            )
+            ),
+            $httpClient
         );
     }
 }
