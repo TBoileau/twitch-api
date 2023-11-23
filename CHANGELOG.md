@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.4] 2023-11-23
+### Updated
+* Make the method call to set HttpClient to AbstractOperations lazy
+
 ## [1.0.3] 2023-11-22
 ### Updated
 * Throw TwitchUnauthorizedException only if response status code is equal to 401
